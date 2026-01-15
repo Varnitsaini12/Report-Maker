@@ -316,11 +316,28 @@ def generate_report(req: ReportRequest):
         except:
             return d
 
+    def get_date_parts(d):
+        try:
+            dt = datetime.strptime(d, "%Y-%m-%d")
+            day = dt.day
+            if 4 <= day <= 20 or 24 <= day <= 30:
+                suffix = "th"
+            else:
+                suffix = ["st", "nd", "rd"][day % 10 - 1]
+            return str(day), suffix, dt.strftime(' %B %Y') # leading space for month
+        except:
+            return d, "", ""
+
+    end_day, end_suffix, end_month_year = get_date_parts(req.end_date)
+
     context = {
         "client_name": req.client_name,
         "app_url": req.app_url,
         "start_date": fmt(req.start_date),
         "end_date": fmt(req.end_date),
+        "end_day": end_day,
+        "end_suffix": end_suffix,
+        "end_month_year": end_month_year,
         "contact_person": req.contact_person,
         "email": req.email,
         "phone": req.phone,
