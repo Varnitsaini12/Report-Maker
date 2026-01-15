@@ -4,10 +4,13 @@ import axios from "axios";
 import { FileText, Download, ShieldAlert, Plus, Trash2, LayoutDashboard, Search, FilePlus } from "lucide-react";
 import CreateVulnerability from "./CreateVulnerability";
 
+import ChecklistSection from "./ChecklistSection";
+
 export default function App() {
   const [view, setView] = useState("dashboard"); // 'dashboard' | 'create'
   const [db, setDb] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [checklistData, setChecklistData] = useState({});
   const [reportData, setReportData] = useState({
     client_name: "Acme Corp",
     app_url: "https://app.acme.com",
@@ -52,6 +55,10 @@ export default function App() {
     setCart(cart.map((v) => (v.id === id ? { ...v, affected_url: text } : v)));
   };
 
+  const handleChecklistChange = (key, value) => {
+    setChecklistData(prev => ({ ...prev, [key]: value }));
+  };
+
   const uploadPoc = async (vulnId, file) => {
     const formData = new FormData();
     formData.append("vuln_id", vulnId);
@@ -69,8 +76,6 @@ export default function App() {
     }
   };
 
-
-
   const deletePoc = async (vulnId, filename) => {
     try {
       await axios.delete(`http://localhost:8000/api/delete-poc?filename=${filename}`);
@@ -87,6 +92,9 @@ export default function App() {
 
   const handleDownload = async () => {
     try {
+      // transform checklistData into list of objects if needed, or send as map
+      // Backend expects: checklist: { "A01: ...|CWE - ...": "Found", ... }
+
       const payload = {
         ...reportData,
         selected_ids: cart.map((v) => ({
@@ -94,7 +102,9 @@ export default function App() {
           custom_desc: v.custom_desc,
           affected_url: v.affected_url,
         })),
+        checklist: checklistData
       };
+
       const response = await axios.post(
         "http://localhost:8000/api/generate",
         payload,
@@ -260,12 +270,17 @@ export default function App() {
 
                   <div>
                     <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 block">Auditor Name</label>
-                    <input
+                    <select
                       className="w-full glass-input p-3 rounded-lg text-sm"
-                      placeholder="Auditor Name"
                       value={reportData.auditor_name}
                       onChange={(e) => setReportData({ ...reportData, auditor_name: e.target.value })}
-                    />
+                    >
+                      <option value="" disabled>Select Auditor</option>
+                      <option value="Mr. Deepanshu Kumar" className="bg-slate-800">Mr. Deepanshu Kumar</option>
+                      <option value="Mr. Subham Raj Mourya" className="bg-slate-800">Mr. Subham Raj Mourya</option>
+                      <option value="Mr. Tanveer Alam" className="bg-slate-800">Mr. Tanveer Alam</option>
+                      <option value="Miss Garima Kalra" className="bg-slate-800">Miss Garima Kalra</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -329,6 +344,10 @@ export default function App() {
 
             {/* RIGHT COLUMN: Live Preview / Builder */}
             <div className="lg:col-span-8 space-y-6">
+
+              {/* Checklist Section Rendering */}
+              <ChecklistSection data={checklistData} onChange={handleChecklistChange} />
+
               <div className="glass-panel p-8 rounded-2xl min-h-[85vh] relative overflow-hidden">
                 {/* Decorative background element */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -z-10 animate-pulse"></div>

@@ -52,6 +52,7 @@ class ReportRequest(BaseModel):
     auditor_name: Optional[str] = ""
     engagement_type: Optional[str] = "Web Application Security Assessment"
     selected_ids: List[VulnSelection]
+    checklist: Optional[dict] = {}
 
 class VulnerabilityCreate(BaseModel):
     title: str
@@ -219,6 +220,96 @@ def generate_report(req: ReportRequest):
 
         v["pocs"] = imgs
 
+    # ---------------- checklist ----------------
+    master_checklist = {
+        "A01: Broken Access Control": [
+            "CWE - 22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')",
+            "CWE - 352: Cross-Site Request Forgery (CSRF)",
+            "CWE - 276: Incorrect Default Permissions"
+        ],
+        "A02: Cryptographic Failures": [
+            "None"
+        ],
+        "A03: Injection": [
+            "CWE - 79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')",
+            "CWE - 89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+            "CWE - 20: Improper Input Validation",
+            "CWE - 78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')",
+            "CWE - 77: Improper Neutralization of Special Elements used in a Command ('Command Injection')",
+            "CWE - 94: Improper Control of Generation of Code ('Code Injection')"
+        ],
+        "A04: Insecure Design": [
+            "CWE - 434: Unrestricted Upload of File with Dangerous Type"
+        ],
+        "A05: Security Misconfiguration": [
+            "CWE - 611: Improper Restriction of XML External Entity Reference"
+        ],
+        "A06: Vulnerable and Outdated Components": [
+            "CWE - 190: Integer Overflow or Wraparound"
+        ],
+        "A07: Identification and Authentication Failures": [
+            "CWE - 287: Improper Authentication",
+            "CWE - 798: Use of Hard-coded Credentials",
+            "CWE - 306: Missing Authentication for Critical Function"
+        ],
+        "A08: Software and Data Integrity Failures": [
+            "CWE - 502: Deserialization of Untrusted Data"
+        ],
+        "A09: Security Logging and Monitoring Failures": [
+            "None"
+        ],
+        "A10: Server-Side Request Forgery": [
+            "CWE - 918: Server-Side Request Forgery (SSRF)"
+        ],
+        "Others": [
+            "CWE - 119: Improper Restriction of Operations within the Bounds of a Memory Buffer",
+            "CWE - 125: Out-of-bounds Read",
+            "CWE - 362: Concurrent Execution using Shared Resource with Improper Synchronization ('Race Condition')",
+            "CWE - 400: Uncontrolled Resource Consumption",
+            "CWE - 416: Use After Free",
+            "CWE - 476: NULL Pointer Dereference",
+            "CWE - 787: Out-of-bounds Write",
+            "CWE - 862: Missing Authorization"
+        ]
+    }
+
+    # checklist context mapping
+    # Maps specific items to template variables like {{ cwe_79 }} or {{ status_a02 }}
+    
+    import re
+    checklist_context = {}
+    user_checklist = req.checklist or {}
+
+    for cat, items in master_checklist.items():
+        # Get category prefix (A01, A02, ..., Others)
+        if ":" in cat:
+            cat_prefix = cat.split(":")[0].lower()
+        else:
+            cat_prefix = cat.lower()
+            
+        # User now sends status per category (e.g. key="A01: Broken Access Control")
+        # We default to "Not Found" if the category isn't in the checklist
+        cat_status = user_checklist.get(cat, "Not Found")
+
+        for item in items:
+            # All items in this category inherit the category's status
+            status = cat_status
+            
+            var_name = ""
+            # Try to find CWE number
+            cwe_match = re.search(r"CWE - (\d+)", item)
+            if cwe_match:
+                var_name = f"cwe_{cwe_match.group(1)}"
+            elif item == "None":
+                var_name = f"status_{cat_prefix}"
+            else:
+                # Fallback for anything else (shouldn't happen with current data)
+                clean_item = re.sub(r"[^a-zA-Z0-9]", "_", item[:10]).lower()
+                var_name = f"status_{cat_prefix}_{clean_item}"
+            
+            if var_name:
+                checklist_context[var_name] = status
+
     def fmt(d):
         try:
             return datetime.strptime(d, "%Y-%m-%d").strftime("%d-%m-%Y")
@@ -238,13 +329,24 @@ def generate_report(req: ReportRequest):
         "vulns": selected_vulns,
         "vuln_count": len(selected_vulns)
     }
+    
+    # Merge checklist variables into context
+    context.update(checklist_context)
 
     try:
         doc.render(context)
-
+        
+        # Save temp and reopen to ensure consistency if needed, but stream is fine
         stream = io.BytesIO()
         doc.save(stream)
         stream.seek(0)
+        
+        # 🔥 Delete PoCs after successful generation
+        for f in os.listdir(UPLOAD_DIR):
+            try:
+                os.remove(os.path.join(UPLOAD_DIR, f))
+            except:
+                pass
 
         filename = f"Report_{req.client_name}_{datetime.now().strftime('%Y%m%d')}.docx"
 
