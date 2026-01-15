@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "title": "Brute Force Attack",
+    "severity": "High",
+    "cvss": 8.6,
+    "cwe": "CWE-307",
+    "description": "A Brute Force attack is a trial-and-error method used by attackers to guess valid credentials...",
+    "impact": "1. Unauthorized Account Access...\n2. Data Breach...",
+    "recommendation": "1. Rate Limiting: Implement per-IP and per-account request limits..."
+  },
+  {
+    "id": 2,
+    "title": "Weak Ciphers Enabled",
+    "severity": "High",
+    "cvss": 8.0,
+    "cwe": "CWE-326",
+    "description": "The server supports outdated or weak cryptographic ciphers (e.g., RC4, DES)...",
+    "impact": "Confidentiality Loss – Attackers may decrypt sensitive traffic...",
+    "recommendation": "Disable weak ciphers – Remove RC4, DES, 3DES..."
+  },
+  {
+    "id": 3,
+    "title": "Missing Security Headers",
+    "severity": "Low",
+    "cvss": 2.9,
+    "cwe": "CWE-16",
+    "description": "The application does not implement one or more recommended HTTP security headers...",
+    "impact": "Increased Attack Surface – Lack of headers such as CSP...",
+    "recommendation": "Implement Strong Headers – Add Content-Security-Policy (CSP)..."
+  }
+]

@@ -1,0 +1,201 @@
+[
+    {
+        "id": 1,
+        "title": "NoSQL Injection",
+        "severity": "High",
+        "cvss": 8.1,
+        "cwe": "CWE-943",
+        "description": "The application fails to properly validate user input before using it in NoSQL database queries, allowing attackers to manipulate query logic and bypass security controls.",
+        "impact": "1. Authentication bypass is possible using crafted query operators.\n2. Sensitive data can be extracted from the database.\n3. Database integrity may be compromised.",
+        "recommendation": "1. Enforce strict input validation and type checks.\n2. Use parameterized queries or safe query builders.\n3. Apply least privilege access to database accounts."
+    },
+    {
+        "id": 2,
+        "title": "Hardcoded Credentials in JavaScript Files",
+        "severity": "High",
+        "cvss": 7.4,
+        "cwe": "CWE-798",
+        "description": "Sensitive credentials such as API keys, tokens, or passwords are hardcoded in client-side JavaScript files, making them accessible to anyone.",
+        "impact": "1. Unauthorized access to backend services may occur.\n2. Third-party services can be abused.\n3. Attackers may escalate privileges.",
+        "recommendation": "1. Remove credentials from client-side code.\n2. Store secrets securely in server-side configuration.\n3. Rotate all exposed credentials."
+    },
+    {
+        "id": 3,
+        "title": "Cookies HTTPOnly Flag Not Set",
+        "severity": "Low",
+        "cvss": 2.5,
+        "cwe": "CWE-1004",
+        "description": "Session cookies are set without the HTTPOnly attribute, allowing client-side scripts to access them.",
+        "impact": "1. Session cookies can be stolen via XSS.\n2. User accounts may be hijacked.\n3. XSS impact is increased.",
+        "recommendation": "1. Enable HTTPOnly flag for all sensitive cookies.\n2. Use Secure and SameSite attributes.\n3. Audit cookie configurations regularly."
+    },
+    {
+        "id": 4,
+        "title": "Application Vulnerable to SWEET32 Attack",
+        "severity": "Medium",
+        "cvss": 5.8,
+        "cwe": "CWE-326",
+        "description": "The server supports 64-bit block ciphers such as 3DES or Blowfish, which are vulnerable to SWEET32 attacks.",
+        "impact": "1. Encrypted data may be partially recovered.\n2. Session cookies can be exposed.\n3. Compliance requirements may be violated.",
+        "recommendation": "1. Disable 3DES and Blowfish ciphers.\n2. Enforce AES-GCM or ChaCha20 ciphers.\n3. Update TLS configurations."
+    },
+    {
+        "id": 5,
+        "title": "Trace Method Enabled",
+        "severity": "Low",
+        "cvss": 2.0,
+        "cwe": "CWE-693",
+        "description": "The HTTP TRACE method is enabled on the server, which can be exploited for Cross-Site Tracing attacks.",
+        "impact": "1. Authentication cookies can be stolen.\n2. Authorization headers may be exposed.\n3. Attack surface is increased.",
+        "recommendation": "1. Disable the TRACE method.\n2. Restrict allowed HTTP methods.\n3. Regularly audit HTTP methods."
+    },
+    {
+        "id": 6,
+        "title": "File Upload Functionality Not Working",
+        "severity": "Informational",
+        "cvss": 1.0,
+        "cwe": "CWE-703",
+        "description": "The file upload feature is not functioning as expected, indicating a functional defect.",
+        "impact": "1. Business workflow is disrupted.\n2. User experience is negatively affected.\n3. Hidden security issues may go unnoticed.",
+        "recommendation": "1. Fix the upload functionality.\n2. Implement proper validation after fixing.\n3. Perform security testing."
+    },
+    {
+        "id": 7,
+        "title": "Brute Force Attack",
+        "severity": "High",
+        "cvss": 8.6,
+        "cwe": "CWE-307",
+        "description": "The application does not restrict repeated login attempts, allowing attackers to perform brute force attacks.",
+        "impact": "1. User accounts can be compromised.\n2. Sensitive data may be accessed.\n3. System trust is reduced.",
+        "recommendation": "1. Implement account lockout mechanisms.\n2. Add CAPTCHA or MFA.\n3. Monitor failed login attempts."
+    },
+    {
+        "id": 8,
+        "title": "SQL Injection",
+        "severity": "Critical",
+        "cvss": 9.8,
+        "cwe": "CWE-89",
+        "description": "User input is directly used in SQL queries without proper sanitization, allowing query manipulation.",
+        "impact": "1. Complete database compromise is possible.\n2. Sensitive data can be stolen.\n3. Database integrity may be destroyed.",
+        "recommendation": "1. Use prepared statements.\n2. Validate and sanitize inputs.\n3. Apply least privilege database access."
+    },
+    {
+        "id": 9,
+        "title": "Stored Cross-Site Scripting (XSS)",
+        "severity": "High",
+        "cvss": 8.2,
+        "cwe": "CWE-79",
+        "description": "Malicious scripts are stored in the application and executed in users\u2019 browsers.",
+        "impact": "1. Session hijacking is possible.\n2. User data can be stolen.\n3. Application trust is affected.",
+        "recommendation": "1. Encode output properly.\n2. Validate user input.\n3. Implement CSP."
+    },
+    {
+        "id": 10,
+        "title": "Reflected Cross-Site Scripting (XSS)",
+        "severity": "High",
+        "cvss": 8.0,
+        "cwe": "CWE-79",
+        "description": "Malicious scripts are reflected from user input in HTTP responses.",
+        "impact": "1. Users can be tricked into executing scripts.\n2. Cookies may be stolen.\n3. Phishing attacks become easier.",
+        "recommendation": "1. Encode reflected output.\n2. Validate input parameters.\n3. Use CSP headers."
+    },
+    {
+        "id": 11,
+        "title": "Stored XSS via File Upload",
+        "severity": "High",
+        "cvss": 8.4,
+        "cwe": "CWE-79",
+        "description": "Uploaded files contain malicious scripts that execute when accessed by users.",
+        "impact": "1. Persistent attacks affect multiple users.\n2. User sessions can be hijacked.\n3. Reputation damage occurs.",
+        "recommendation": "1. Validate file content.\n2. Restrict file types.\n3. Serve files with safe MIME types."
+    },
+    {
+        "id": 12,
+        "title": "Application Vulnerable to Lucky13 Attack",
+        "severity": "Medium",
+        "cvss": 5.9,
+        "cwe": "CWE-327",
+        "description": "The application supports vulnerable TLS CBC cipher modes susceptible to Lucky13 attacks.",
+        "impact": "1. Encrypted data may be partially exposed.\n2. Session confidentiality is reduced.\n3. Compliance risks increase.",
+        "recommendation": "1. Disable CBC ciphers.\n2. Use AEAD ciphers.\n3. Update TLS configuration."
+    },
+    {
+        "id": 13,
+        "title": "Application Vulnerable to BREACH Attack",
+        "severity": "Medium",
+        "cvss": 5.3,
+        "cwe": "CWE-200",
+        "description": "HTTP compression is enabled on sensitive responses, allowing BREACH exploitation.",
+        "impact": "1. Secrets in responses may be leaked.\n2. Session tokens may be exposed.\n3. Confidentiality is reduced.",
+        "recommendation": "1. Disable compression for sensitive pages.\n2. Use random padding.\n3. Separate secrets from user input."
+    },
+    {
+        "id": 14,
+        "title": "Banner Grabbing",
+        "severity": "Low",
+        "cvss": 2.5,
+        "cwe": "CWE-200",
+        "description": "The server discloses software version information in banners.",
+        "impact": "1. Attackers gain reconnaissance information.\n2. Targeted attacks become easier.\n3. System exposure increases.",
+        "recommendation": "1. Hide server banners.\n2. Use generic responses.\n3. Regularly update software."
+    },
+    {
+        "id": 15,
+        "title": "Clickjacking",
+        "severity": "Low",
+        "cvss": 2.9,
+        "cwe": "CWE-1021",
+        "description": "The application can be embedded in frames, allowing UI redressing attacks.",
+        "impact": "1. Users may perform unintended actions.\n2. Sensitive operations can be triggered.\n3. Trust is reduced.",
+        "recommendation": "1. Use X-Frame-Options header.\n2. Implement CSP frame-ancestors.\n3. Test iframe protections."
+    },
+    {
+        "id": 16,
+        "title": "Missing Security Headers",
+        "severity": "Low",
+        "cvss": 2.9,
+        "cwe": "CWE-16",
+        "description": "The application does not implement recommended HTTP security headers.",
+        "impact": "1. Browser protections are reduced.\n2. XSS risk increases.\n3. Clickjacking risk increases.",
+        "recommendation": "1. Add CSP header.\n2. Add X-Content-Type-Options.\n3. Add Referrer-Policy."
+    },
+    {
+        "id": 17,
+        "title": "Weak Ciphers Enabled",
+        "severity": "High",
+        "cvss": 8.0,
+        "cwe": "CWE-326",
+        "description": "The server supports outdated or weak cryptographic ciphers.",
+        "impact": "1. Encrypted data may be decrypted.\n2. Session confidentiality is lost.\n3. Compliance issues arise.",
+        "recommendation": "1. Disable weak ciphers.\n2. Enforce strong cipher suites.\n3. Review TLS policies."
+    },
+    {
+        "id": 18,
+        "title": "Improper Error Handling",
+        "severity": "Medium",
+        "cvss": 5.6,
+        "cwe": "CWE-209",
+        "description": "The application reveals detailed error messages to users.",
+        "impact": "1. Internal logic is exposed.\n2. Attackers gain reconnaissance.\n3. Security posture weakens.",
+        "recommendation": "1. Show generic errors.\n2. Log detailed errors internally.\n3. Disable debug mode in production."
+    },
+    {
+        "id": 19,
+        "title": "Improper Input Validation",
+        "severity": "Medium",
+        "cvss": 6.5,
+        "cwe": "CWE-20",
+        "description": "The application does not properly validate user input before processing.",
+        "impact": "1. Injection attacks become possible.\n2. Application logic may be bypassed.\n3. System stability is affected.",
+        "recommendation": "1. Implement strict validation rules.\n2. Use allowlist approach.\n3. Validate on both client and server."
+    },
+    {"id": 20,
+        "title": "Hardcoded API Key",
+        "severity": "High",
+        "cvss": 8.0,
+        "cwe": "CWE-798",
+        "description": "The application contains hardcoded API keys within source code or configuration files, making them accessible to anyone with access to the code or deployed client-side resources. This exposes backend or third\u2011party services to unauthorized use and abuse. This weakness increases the overall attack surface of the application and can be exploited remotely depending on access controls and exposure of the affected component.",
+        "impact": "1. Unauthorized users can access protected APIs.\n2. API usage limits or billing may be abused.\n3. Backend services may be compromised.",
+        "recommendation": "1. Remove API keys from source code.\n2. Store secrets in environment variables or secret managers.\n3. Rotate and revoke exposed API keys."
+    }
+]
