@@ -31,3 +31,35 @@ This system allows security teams to:
 
 ## 📁 Project Structure
 
+project-root/
+│
+├── main.py
+├── vulnerabilities.json
+├── uploads/ (auto-created, ignored in git)
+├── template.docx (NOT tracked in git)
+├── App.jsx
+├── .gitignore
+└── README.md
+
+
+---
+
+## ⚠️ Important Notice About `template.docx`
+
+> 🔴 **The file `template.docx` is NOT included in this repository.**
+
+You must **create your own Word template** according to your reporting requirements.
+
+### 📝 Instructions:
+
+1. Create a file named `template.docx`
+2. Design it using Microsoft Word
+3. Add DocxTemplate placeholders like:
+
+```jinja2
+{{ client_name }}
+{{ app_url }}
+
+{% for v in vulns %}
+{{ v.detail_index }} {{ v.title }}
+{% endfor %}
