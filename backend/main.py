@@ -46,11 +46,14 @@ class ReportRequest(BaseModel):
     app_url: str
     start_date: str
     end_date: str
+    level_1_end_date: Optional[str] = ""
+    level_2_start_date: Optional[str] = ""
     contact_person: Optional[str] = ""
     email: Optional[str] = ""
     phone: Optional[str] = ""
     auditor_name: Optional[str] = ""
     engagement_type: Optional[str] = "Web Application Security Assessment"
+    report_type: Optional[str] = "level-1"
     selected_ids: List[VulnSelection]
     checklist: Optional[dict] = {}
 
@@ -153,7 +156,8 @@ def generate_report(req: ReportRequest):
 
     selected_vulns.sort(key=lambda x: x["rank"], reverse=True)
 
-    doc = DocxTemplate("template.docx")
+    template_file = "closure_template.docx" if req.report_type == "closure" else "template.docx"
+    doc = DocxTemplate(template_file)
 
     # Load PoCs
     poc_map = {}
@@ -328,6 +332,39 @@ def generate_report(req: ReportRequest):
         except:
             return d, "", ""
 
+    # Helper to add formatted date to RichText
+    def add_date_to_rt(rt, d_str):
+        try:
+            dt = datetime.strptime(d_str, "%Y-%m-%d")
+            day = dt.day
+            if 4 <= day <= 20 or 24 <= day <= 30:
+                suffix = "th"
+            else:
+                suffix = ["st", "nd", "rd"][day % 10 - 1]
+            
+            rt.add(f"{dt.strftime('%B')} {day}", font="Calibri", size=22)
+            rt.add(suffix, font="Calibri", size=22, superscript=True)
+            rt.add(f", {dt.year}", font="Calibri", size=22)
+        except:
+            rt.add(d_str, font="Calibri", size=22)
+
+    # Build engagement_timeframe with RichText
+    engagement_rt = RichText()
+    add_date_to_rt(engagement_rt, req.start_date)
+    engagement_rt.add(" to ", font="Calibri", size=22)
+    add_date_to_rt(engagement_rt, req.end_date)
+
+    # Closure specific dates
+    l1_end_rt = ""
+    if req.level_1_end_date:
+        l1_end_rt = RichText()
+        add_date_to_rt(l1_end_rt, req.level_1_end_date)
+    
+    l2_start_rt = ""
+    if req.level_2_start_date:
+        l2_start_rt = RichText()
+        add_date_to_rt(l2_start_rt, req.level_2_start_date)
+
     end_day, end_suffix, end_month_year = get_date_parts(req.end_date)
 
     context = {
@@ -335,6 +372,9 @@ def generate_report(req: ReportRequest):
         "app_url": req.app_url,
         "start_date": fmt(req.start_date),
         "end_date": fmt(req.end_date),
+        "level_1_end_date": l1_end_rt,
+        "level_2_start_date": l2_start_rt,
+        "engagement_timeframe": engagement_rt, # RichText object
         "end_day": end_day,
         "end_suffix": end_suffix,
         "end_month_year": end_month_year,
@@ -353,7 +393,7 @@ def generate_report(req: ReportRequest):
     try:
         doc.render(context)
         
-        # Save temp and reopen to ensure consistency if needed, but stream is fine
+        # Save final
         stream = io.BytesIO()
         doc.save(stream)
         stream.seek(0)
